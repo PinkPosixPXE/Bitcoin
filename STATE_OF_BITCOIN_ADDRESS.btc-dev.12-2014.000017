@@ -1,0 +1,201 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+ ..::[ The Bitcoin Foundation: STATE OF BITCOIN ADDRESS ]::..
+
+     [        Date: 2014.11.28                          ]
+     [   Co-Chairs: mod6 [R.01] && ben_vulpes [R.02]    ]
+
+0x00] Introduction
+
+      It is with great honor and satisfaction that The Bitcoin Foundation
+      embraces this opportunity to address the public on the state of current
+      progress, obstacles and continuing steps in our mission.
+
+      Henceforth, The Bitcoin Foundation will provide an Address regarding its
+      on-goings once per calendar month.
+
+0x01] Accomplishments
+
+      [ Review of Submitted Patches ]:
+      First, it was decided to perform technical review on patches submitted
+      and what overall impact these patches had on the Bitcoin v0.5.3 codebase.
+
+      The following patch files were reviewed:
+      0x0A]: bitcoin-asciilifeform.1.patch
+      0x0B]: rm_rf_upnp.patch
+      0x0C]: bitcoin-asciilifeform.2-https_snipsnip.patch
+      0x0D]: bitcoin-asciilifeform.3-turdmeister-alert-snip.patch
+      0x0E]: bitcoin-asciilifeform.4-goodbye-win32.patch
+      0x0F]: reward_overwflow.patch
+
+      During the patch testing phase, we noticed that Dignork's [R.03]
+      patch [R.04] would not patch cleanly. The Bitcoin v0.5.3 [R.05] codebase
+      with SHA256 Hash [R.06] already contains this bug fix so this submission
+      has been left aside.
+
+      Additionally, to get an idea of the overall scope and impact of patches
+      submitted, we performed a numerical analysis of the files cut from the
+      Bitcoin v0.5.3 codebase.
+
+      asciilifeform's [R.07] manifest [R.08] file pares the Bitcoin v0.5.3
+      codebase down to a total of 68 files from the initial 296 files.  We
+      proceeded to count up the total lines from files pruned from the codebase:
+
+      perl -e '
+      @a=`cat /tmp/prune-bitcoin.files`; my $sum = 0;
+      my $count = 0;
+      foreach(@a) {
+      chomp $_; my $r = `cat $_ | wc -l`; chomp $r; $sum = $sum + $r; $count++;
+      }
+      print "Number of files cut from v0.5.3 codebase: $count,
+      total lines cut from files: $sum\n";
+      '
+      Number of files cut from v0.5.3 codebase: 228,
+      total lines cut from files: 55697
+
+      Next, we also performed a numerical analysis of how many lines were to
+      be cut by patches from the 68 files remaining in the codebase:
+
+      perl -e '
+      @a=("bitcoin-asciilifeform.1.patch",
+      "rm_rf_upnp/rm_rf_upnp.patch",
+      "bitcoin-asciilifeform.2-https_snipsnip.patch",
+      "bitcoin-asciilifeform.3-turdmeister-alert-snip.patch",
+      "bitcoin-asciilifeform.4-goodbye-win32.patch");
+      my $cut = 0;
+      foreach(@a) {
+      chomp $_; my $r = `cat $_ | egrep "^-" | wc -l`; $cut = $cut + $r;
+      }
+      print "Total lines cut from patches: $cut\n";
+      '
+      Total lines cut from patches: 1303
+
+      Thanks to asciilifeform and ben_vulpes for submitting these patches, your
+      efforts are greatly appreciated.
+
+      [ Testing of Submitted Patches ]:
+      Based upon objectives in the November ToDo list [R.09], we were
+      successful in patching the Bitcoin v0.5.3 codebase and completing
+      a successful compile of the patched code [R.0A].  The first
+      requirement in section `0x0' was swept aside as each patch is dependant
+      on the previous patch to patch the codebase cleanly.
+
+      Once the all the patches [0x0A-0x0E above] were patched in cleanly, the
+      patched v0.5.3 codebase compiled successfully.  Upon running the patched
+      and compiled reference implementation it did successfully begin to pull
+      down blocks from peers on the network.
+
+      [ Wedge Issue at Block 252450 ]:
+      ben_vulpes successfully reproduced the wedge at block 252450 with the
+      unpatched Bitcoin v0.5.3 codebase.  [ There are current on-going efforts
+      to reproduce the wedge at block 252450 with the patched codebase. ]
+
+      kakobrekla [R.0B], very helpfully, charted the memory usage of the v0.7
+      Bitcoin reference implementation to give a visual to the memory leaks
+      occurring on or around block 252450 [R.0C].  This chart distinctly shows
+      three spikes [green line] before his configuration change to Berkeley
+      Database [R.0D] fixed the memory leak, allowing it to bypass the wedge
+      block 252450.  The Foundation appreciates your efforts surrounding the
+      wedging issue.
+
+      These two accomplishments helped us to achieve our objectives `0x1' from
+      the November ToDo list [R.09]: reproducing the wedge with v0.5.3 and
+      having a more in-depth technical understanding of why the wedge occurs.
+
+      [ Testing Environment ]:
+      ben_vulpes is actively working on building a testing environment complete
+      with a build & continuous integration server with additional instances
+      ready for deployment.  This environment will allow us to work separately
+      a sandbox and test changes.
+
+      [ The Mailing List ]:
+      jurov [R.0E], in addition to his Treasury duties, has configured Mailman
+      to relay our BTC-Dev messages.  This was was an important task that also
+      came with some unforeseen complications.  jurov's efforts in configuring
+      and maintaining the mailing list are very much appreciated.
+
+      [ A Script To Prune Files ]:
+      mod6 created a document called ``Building with Patch Files'' [R.0A].  This
+      document describes in detail how to build the reference implementation up
+      to this point with the submitted patches.  A script was required to prune
+      the Bitcoin v0.5.3 codebase down to 68 total files as directed by
+      asciilifeform's manifest [R.08].  PinkPosixPXE [R.0F] was called upon to
+      help build a script that accomplishes this task.  Her contribution is
+      contained within mod6's document [R.0A].  We thank you for your efforts
+      on such short notice, we appreciate it.
+
+0x02] Complications and Obstacles
+
+      During the first month of operations the complications obstacles were
+      generally related to the ``boot-strapping'' of the foundation: Setting up
+      environments for testing and analysis, discussions about overall strategy
+      and approach to testing & schedule of tasks, and testing and debugging of
+      the Wedge Issue at Block 252450.
+
+      Overall, things are moving along nicely.
+
+0x03] Continuing Steps
+
+      Next month, December 2014, there will be continued regression testing of
+      the patched v0.5.3 reference implementation.  As we have seen above there
+      were a total of 228 files cut from the original v0.5.2 codebase for a
+      total of 55697 lines of code.  As well as 1303 lines removed from the
+      remaining 68 files.  This continued regression testing will help to
+      ensure that the code has not regressed.  We want to ensure that all
+      cruft removed from the codebase has not impacted any other
+      functionality.
+
+      There will also be continued analysis of the Wedge Issue at Block 252450
+      as the reproduction of this problem with the patched reference
+      implementation is still on-going.  Provided that the wedge issue is
+      reproduced with the patched codebase, we will be attempting to change
+      database configurations as kakobrekla did with his contribution [R.0D]
+      to hopefully alleviate this condition.  In the case that it does not,
+      further analysis and debugging will commence around this problem.
+
+0x04] Conclusion
+
+      The health and success of our beloved Bitcoin is the object of which
+      our greatest cares and efforts ought to be directed, and we humbly ask
+      for your continued cooperation and collaboration to set forth a
+      lightweight, coherent and cruft-free reference implementation.
+
+      The Bitcoin Foundation would like bestow our sincerest thanks and
+      gratitude to the contributors and community for its support.
+
+[ References ]:
+    [R.01] 027A 8D7C 0FB8 A166 4372 0F40 7217 05A8 B71E ADAF
+    [R.02] 4F79 0794 2CA8 B89B 01E2 5A76 2AFA 1A9F D2D0 31DA
+    [R.03] C333 0E59 5A36 9D17 A9FF FCFE 8334 BB7B 5BDF A126
+    [R.04] http://f9beb4d9.org/ml/btc-dev/2014-October/000004.html
+    [R.05] https://codeload.github.com/bitcoin/bitcoin/legacy.tar.gz/v0.5.3
+    [R.06] aab1f8ea8c7f131ff69dfa3b9437ba35531018be760132dd6373f41a591f6382
+    [R.07] 1721 5D11 8B72 3950 7FAF ED98 B982 28A0 01AB FFC7
+    [R.08] bitcoin-0.5.3-no-crud.sha256.manifest
+    [R.09] http://f9beb4d9.org/ml/btc-dev/2014-November/000008.html
+    [R.0A] http://f9beb4d9.org/ml/btc-dev/2014-December/000015.html
+    [R.0B] 27C3 CE9A 2085 1312 F086 268C 27AF 7532 1F24 89E8
+    [R.0C] http://shrani.si/f/1Y/ZE/bLTXXcQ/memory.png
+    [R.0D] http://pastebin.com/raw.php?i=MP2RzuWj
+    [R.0E] BBB0 A999 5003 7551 F533 850A 677A BD62 D0AE E7D7
+    [R.0F] 3DAE 5385 2AF4 7432 CE3C 9318 FF23 EAA3 D815 427F
+
+EOF
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.13 (FreeBSD)
+
+iQIcBAEBCgAGBQJUfJgJAAoJEHIXBai3Hq2vreEP/2r81WmqTNAYSZF2zLsMEDgZ
+m6E4LBmOYS++NyKOSe6uCCaBYgzeI9XmBqib75M0+Qcb70sK5v73p/NsvYVuzog3
+zrH34fVP4ygisKgyNph4HCFNpXgjX3L2jYszre3pjgAF/Mk+viFt4P3zuD6R3JZX
+iJ1VQW71RJtcCVtht4s0NQ5CV0CmMyx/1jeHp6/tsxi1Bu5tDKf8VJpfabGLrZZV
+82j98UUur7H9pjFdbwD/8ulb69Sl6Ty/FHhcGKjWxx5QWvJ0pMiv3wMQTcYiWOk1
+mRAcIeLMR8spsU43ywAmWN5fXaRMzh/obUcR6H1WelRkj6Bg6cdJq6M2y6V66WY+
+wBjkvegS9iGeqYH42ICtyAfuXCD4qJwfBFm46ptcFSCifYpKwQ4SxO5aQTmS5BHy
+xHIwJTF8kBBvuhijmJdS4cUMf+Zs+eqhIMzg/p42i/m+HAgV7NECqjmTQ3iZqGM+
+4IErOeViKBm1RMx25BLLFfHCM4Dv0kDmHDFBb2DbBWzcedf+BouF4aSxZ4KHydoy
+VhOrW9TMwc6Y1cprbFe33ZZMecC7rHd896xpzXPpT2Mx/8ZHm3PHVKmFxaYSd3g7
+hFNXdACkePBiWq2MVYv4qoAtwHagKD4oK7UjcENkBDi/4cCfBOmAZPjqof/1cURE
+Ix9hMKJvCx8SSiptG/q/
+=gG8n
+-----END PGP SIGNATURE-----

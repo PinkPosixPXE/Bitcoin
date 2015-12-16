@@ -1,0 +1,308 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [BTC-dev] Patching The Reference Implementation: A Guide
+   </TITLE>
+   <LINK REL="Index" HREF="index.html" >
+   <LINK REL="made" HREF="mailto:btc-dev%40therealbitcoin.org?Subject=Re%3A%20%5BBTC-dev%5D%20Patching%20The%20Reference%20Implementation%3A%20A%20Guide&In-Reply-To=%3CCADy547qh87TuKfEgF%3DKKgDN6UP_sB9sLSvhkPRYpARETR3Q2kw%40mail.gmail.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000016.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[BTC-dev] Patching The Reference Implementation: A Guide</H1>
+    <B>Shane Kinney</B> 
+    <A HREF="mailto:btc-dev%40therealbitcoin.org?Subject=Re%3A%20%5BBTC-dev%5D%20Patching%20The%20Reference%20Implementation%3A%20A%20Guide&In-Reply-To=%3CCADy547qh87TuKfEgF%3DKKgDN6UP_sB9sLSvhkPRYpARETR3Q2kw%40mail.gmail.com%3E"
+       TITLE="[BTC-dev] Patching The Reference Implementation: A Guide">modsix at gmail.com
+       </A><BR>
+    <I>Mon Dec  1 16:30:07 UTC 2014</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000016.html">[BTC-dev] Creating, Naming and Submitting A Patch
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#15">[ date ]</a>
+              <a href="thread.html#15">[ thread ]</a>
+              <a href="subject.html#15">[ subject ]</a>
+              <a href="author.html#15">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+   ..::[  The Bitcoin Foundation: Building with Patch Files  ]::..
+
+       [                    Date: 2014.11.20                 ]
+       [                 Version: 0.0.1                      ]
+       [                  Author: mod6 [R.01]                ]
+
+[ Introduction ]:
+
+        For testing of all of the recently submitted patches and subsequent
+        changes to the Bitcoin reference implementation; a Guide on how to
+        properly verify patches, apply and build with them is necessary for
+        individuals who wish to assist in the arduous testing process.
+
+0x00] A Guide to Building the Bitcoin Reference Implementation with Patches
+
+  0x01] Download Bitcoin source v0.5.3 [R.02] and verify sha256 hash [R.03]:
+        curl [R.02] -s -o bitcoin-v0.5.3.tar.gz
+        sha256sum bitcoin-v0.5.3.tar.gz
+
+  0x02] Unpack the Bitcoin v0.5.3 code:
+        tar -xf bitcoin-v0.5.3.tar.gz
+
+  0x03] Download Patch Tarballs:
+        curl [R.04] -s -o chicken.tar.gz
+        curl [R.06] -s -o rm_rf_upnp.tar.gz
+        curl [R.08] -s -o https-snipsnip.tar.gz
+        curl [R.0A] -s -o turdmeister-alert-snip.tar.gz
+        curl [R.0C] -s -o goodbye-win32.tar.gz
+
+  0x04] Check SHA256 Hashes of Patch Tarballs:
+        sha256sum *.tar.gz
+        [R.05]  chicken.tar.gz
+        [R.0D]  goodbye-win32.tar.gz
+        [R.09]  https-snipsnip.tar.gz
+        [R.07]  rm_rf_upnp.tar.gz
+        [R.0C]  turdmeister-alert-snip.tar.gz
+
+  0x05] Unpack Patches:
+        mkdir -p chicken &amp;&amp; tar -xf chicken.tar.gz -C chicken
+        tar -xf rm_rf_upnp.tar.gz
+        mkdir -p https-snipsnip \
+        &amp;&amp; tar -xf https-snipsnip.tar.gz -C https-snipsnip
+        mkdir -p alert-snip \
+        &amp;&amp; tar -xf turdmeister-alert-snip.tar.gz -C alert-snip
+        mkdir -p goodbye-win32 \
+        &amp;&amp; tar -xf goodbye-win32.tar.gz -C goodbye-win32
+
+  0x06] Verify Patch Signatures:
+        gpg --verify bitcoin-asciilifeform.1.patch.sig
+        gpg --verify rm_rf_upnp/rm_rf_upnp.patch.sig
+        gpg --verify \
+        https-snipsnip/bitcoin-asciilifeform.2-https_snipsnip.patch.sig
+        gpg --verify \
+        alert-snip/bitcoin-asciilifeform.3-turdmeister-alert-snip.patch.sig
+        gpg --verify \
+        goodbye-win32/bitcoin-asciilifeform.4-goodbye-win32.patch.sig
+
+  0x07] Clean Source Base with PinkPosixPXE's [R.0E] prune-manifest.sh script:
+
+        From the below section: ``prune-manifest.sh'', cut the code from
+        &quot;#!/bin/bash&quot; to &quot;###### EOF ######&quot; into ``prune-manifest.sh''
+
+        [ NOTE ]: Be sure to edit the following two lines of the script to
+                  correspond with the appropriate locations of the ``chicken''
+                  directory and the unpacked bitcoin-bitcoin-a8def6b directory:
+
+                  bitcoin=&quot;${HOME}/bitcoin-2014-11-23/bitcoin-bitcoin-a8def6b&quot;
+                  chicken=&quot;${HOME}/bitcoin-2014-11-23/chicken&quot;
+
+        chmod +x prune-manifest.sh
+        ./prune-manifest.sh
+
+        The following commands are optional, their output should be equal:
+
+        find bitcoin-bitcoin-a8def6b \
+        -xtype f -print0 | xargs -0 sha256sum | wc -l
+        cat chicken/bitcoin-0.5.3-no-crud.sha256.manifest | wc -l
+
+  0x08] Patch Bitcoin v0.5.3 Source Base &amp; Clean Up:
+
+        [ NOTE ]: The Bitcoin v0.5.3 codebase must be patched with the
+                  following patches in this exact order or it will not
+                  patch cleanly.
+
+        cd bitcoin-bitcoin-a8def6b
+
+        cp ../chicken/bitcoin-asciilifeform.1.patch .
+        patch -p1 &lt; bitcoin-asciilifeform.1.patch
+        cp ../rm_rf_upnp/rm_rf_upnp.patch .
+        patch -p1 &lt; rm_rf_upnp.patch
+        cp ../https-snipsnip/bitcoin-asciilifeform.2-https_snipsnip.patch .
+        patch -p1 &lt; bitcoin-asciilifeform.2-https_snipsnip.patch
+        cp ../alert-snip/bitcoin-asciilifeform.3-turdmeister-alert-snip.patch .
+        patch -p1 &lt; bitcoin-asciilifeform.3-turdmeister-alert-snip.patch
+        cp ../goodbye-win32/bitcoin-asciilifeform.4-goodbye-win32.patch .
+        patch -p1 &lt; bitcoin-asciilifeform.4-goodbye-win32.patch
+
+
+        [ CLEAN-UP ]:
+        rm bitcoin-asciilifeform.1.patch
+        rm rm_rf_upnp.patch
+        rm bitcoin-asciilifeform.2-https_snipsnip.patch
+        rm bitcoin-asciilifeform.3-turdmeister-alert-snip.patch
+        rm bitcoin-asciilifeform.4-goodbye-win32.patch
+
+  0x09] Compile Patched Source:
+
+        cd src
+        make -f makefile.unix
+
+[ References ]:
+  [R.01]: 027A 8D7C 0FB8 A166 4372 0F40 7217 05A8 B71E ADAF
+  [R.02]: <A HREF="https://codeload.github.com/bitcoin/bitcoin/legacy.tar.gz/v0.5.3">https://codeload.github.com/bitcoin/bitcoin/legacy.tar.gz/v0.5.3</A>
+  [R.03]: aab1f8ea8c7f131ff69dfa3b9437ba35531018be760132dd6373f41a591f6382
+  [R.04]: <A HREF="http://f9beb4d9.org/chicken.tar.gz">http://f9beb4d9.org/chicken.tar.gz</A>
+  [R.05]: 63164ea54f042226a6aa8768b98b0f323d66f08693c6fd271a850c00308517ad
+  [R.06]: <A HREF="http://f9beb4d9.org/rm_rf_upnp.tar.gz">http://f9beb4d9.org/rm_rf_upnp.tar.gz</A>
+  [R.07]: f5f27b806b90b0ffd3d2d73e240eba02f13c5dec3d693b37e08686d04164861a
+  [R.08]: <A HREF="http://f9beb4d9.org/https-snipsnip.tar.gz">http://f9beb4d9.org/https-snipsnip.tar.gz</A>
+  [R.09]: 047844a601bc575d7660826b02f0d640f02ae84cd641f45552c825b72bc116f4
+  [R.0A]: <A HREF="http://f9beb4d9.org/turdmeister-alert-snip.tar.gz">http://f9beb4d9.org/turdmeister-alert-snip.tar.gz</A>
+  [R.0B]: 39b5aac2b6de016eda23a96fe6f9a565dbbe4f4aa46e8584c102ee71fa4fe7f4
+  [R.0C]: <A HREF="http://f9beb4d9.org/goodbye-win32.tar.gz">http://f9beb4d9.org/goodbye-win32.tar.gz</A>
+  [R.0D]: 5149a481629e0f10b659d38fee0736e0b6e631ab3bbeb6cde449aa61226cdbb3
+  [R.0E]: 3DAE 5385 2AF4 7432 CE3C 9318 FF23 EAA3 D815 427F
+
+[ Public Key Fingerprints ]:
+
+  [ asciilifeform ]:
+    1721 5D11 8B72 3950 7FAF ED98 B982 28A0 01AB FFC7
+    <A HREF="http://bitcoin-otc.com/viewgpg.php?nick=asciilifeform">http://bitcoin-otc.com/viewgpg.php?nick=asciilifeform</A>
+
+  [ ben_vulpes ]:
+    4F79 0794 2CA8 B89B 01E2 5A76 2AFA 1A9F D2D0 31DA
+    <A HREF="http://bitcoin-otc.com/viewgpg.php?nick=ben_vulpes">http://bitcoin-otc.com/viewgpg.php?nick=ben_vulpes</A>
+
+  [ mod6 ]:
+    027A 8D7C 0FB8 A166 4372 0F40 7217 05A8 B71E ADAF
+    <A HREF="http://bitcoin-otc.com/viewratingdetail.php?nick=mod6">http://bitcoin-otc.com/viewratingdetail.php?nick=mod6</A>
+
+  [ PinkPosixPXE ]:
+    3DAE 5385 2AF4 7432 CE3C 9318 FF23 EAA3 D815 427F
+    <A HREF="http://bitcoin-otc.com/viewratingdetail.php?nick=pinkposixpxe">http://bitcoin-otc.com/viewratingdetail.php?nick=pinkposixpxe</A>
+
+[ prune-manifest.sh ]:
+
+#!/bin/bash
+## prune_manifest.sh ##
+## Prune Bitcoin Manifests ##
+## Author: PinkPosixPXE - 11/2014 ##
+
+### Put path to bitcoin dir and chicken dir within these variables ###
+bitcoin=&quot;${HOME}/bitcoin-2014-11-23/bitcoin-bitcoin-a8def6b&quot;
+chicken=&quot;${HOME}/bitcoin-2014-11-23/chicken&quot;
+
+#### MANIFESTS AND FILE LISTS ####
+chickenManifest=&quot;${chicken}/bitcoin-0.5.3-no-crud.sha256.manifest&quot;
+### tmp files created for filelists, comparisons, and pruning ###
+newManifest=/tmp/new-bitcoin.manifest
+btcManifest=/tmp/bitcoin-a8def6b.manifest
+btcFiles=/tmp/bitcoin-a8def6b.files
+newFiles=/tmp/new-bitcoin.files
+pruneFiles=/tmp/prune-bitcoin.files
+
+### Array to track file varname, for checking before pruning ###
+fileArr=(newManifest btcManifest chickenManifest btcFiles newFiles pruneFiles)
+####  INIT ####
+### Create required manifests, filelists, and prunelists ###
+init() {
+  cd ${bitcoin}
+  ### Ensure our src dirs exist ###
+  if [[ ! -d &quot;${bitcoin}&quot; ]]; then
+    echo &quot;Error: Can't find bitcoin src path: ${bitcoin}&quot;
+    exit 1
+  elif [[ ! -d &quot;${chicken}&quot; ]];then
+    echo &quot;Error: Can't find chicken src path: ${chicken}&quot;
+    exit 1
+  fi
+  ### clean old tmp files ###
+  rm -v ${newManifest} ${btcFiles} ${newFiles} ${pruneFiles} 2&gt;/dev/null
+  ### Create manifest of current bitcoin src ###
+  find . -xtype f -exec sha256sum {} \; | sort &gt; ${btcManifest}
+  while read line;
+  do
+    mFile=$(echo &quot;${line}&quot; | awk '{print $2}')
+    grep &quot;${mFile}&quot; ${chickenManifest} &gt;&gt; ${newManifest}
+  done &lt; ${btcManifest}
+  ### Manifest parsing ###
+  awk '{print $2}' ${btcManifest} | sort &gt;&gt; ${btcFiles}
+  awk '{print $2}' ${chickenManifest} | sort &gt;&gt; ${newFiles}
+  comm -23 ${btcFiles} ${newFiles} &gt;&gt; ${pruneFiles}
+}
+
+checkFiles() {
+  ## Test files exist, and aren't empty ##
+  for filevar in ${fileArr[*]}
+  do
+    file=&quot;${!filevar}&quot;
+    ## Check if file exists, or is mising ##
+    test ! -e &quot;${file}&quot; || test ! -s &quot;${file}&quot; &amp;&amp;{
+      echo &quot;Error: Required File Missing, or empty: ${file}&quot;
+      exit 1
+    }
+  done
+  ### Check files marked for pruning ###
+  while read file
+  do
+    egrep '^'${file}'$' ${newFiles} &amp;&amp; {
+      echo &quot;Check Failed: required file marked for deletion: ${file}&quot;
+      exit 1
+    }
+  done&lt; ${pruneFiles}
+  return 0
+}
+
+pruneFiles() {
+  echo &quot;Checks Passed -&gt; Pruning unneeded files from manifest&quot;
+  ## Prune manifest, dirs, and tmp files ##
+  ## If you want it to remove the files quietly, remove the -v ##
+  rm -fv $( &lt; ${pruneFiles} ) 2&gt;/dev/null
+  rm -fv ${newManifest} ${btcFiles} ${btcManifest} \
+  ${newFiles} ${pruneFiles} 2&gt;/dev/null
+  rm -rfv ./contrib ./doc ./scripts ./share
+}
+
+init
+checkFiles
+pruneFiles
+###### EOF ######
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.13 (FreeBSD)
+
+iQIcBAEBCgAGBQJUfJTCAAoJEHIXBai3Hq2vDl4QAJiWPYPeadvt/pPJdmf2n3YM
+ksTClNf6VkoHsbC3pwbwBCxb2Lzqn8Q4v0CJIQCb2PmATX2n7cIPiw6wcfkEvLvR
+8mWLBfYdZJFQZRMBy3SFjrSWsIi7rg2UVJhM52pujccN6rUlYItHJ7Lzu0W9zFxp
+xUB9nwhMYAA+b6jBPlRl66f/Z3NhTHHTt9CCnQcxNlrrMXlhkGmU10VU5jfuLN6a
+rvRF/gYFssoNiFmmv4T1pmLM2H9uwnTqotGxS0pBlY4Rmarohf3bOP3Sg3yIX2ny
+u4fGdtqUyVzO7LZZcvt45su7tIMvuEmiD2icvCj6rGLbvBxuv/fsLn+jKKZpL+Uh
+i7efAn1pzkH4eAygPJdMW/Gi8I+330C7DxqRITlceadicdx29rvoNkOHIg2fqTia
+jmsbcu0je+EelS5YMbfWpGKj/Zb5vJfud+ICvZ3B5GI7B59n7Sd/h58DVVfQjVJF
+KacoHRrs6mtn1J9/haOs+pQ2eWbTC4UHvf87JG/tSEDoCB4m8LezymFjtL/Kwnwy
+uy3p9f7T3ed/3bbKQz9ULCbxcAeBRM2GLNZBM2JHrfVADF3IgjJ4E2UzHby4MBu0
+MO9LM7jFVWgYAeuW2Ey4j5aOzQOLk6sWjM6qW3Ju+uVrIYECUEV6jSZR3mpKjLZl
+LZmNoKQ7cSrZhUuS1Ayg
+=Au+t
+-----END PGP SIGNATURE-----
+</PRE>
+
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000016.html">[BTC-dev] Creating, Naming and Submitting A Patch
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#15">[ date ]</a>
+              <a href="thread.html#15">[ thread ]</a>
+              <a href="subject.html#15">[ subject ]</a>
+              <a href="author.html#15">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="http://therealbitcoin.org/mailman/listinfo/btc-dev">More information about the BTC-dev
+mailing list</a><br>
+</body></html>
